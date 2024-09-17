@@ -1,0 +1,41 @@
+require("dotenv").config();
+const helmet = require("helmet");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const express = require("express");
+const app = express();
+const connectMongoDB = require("./database/connectMongoDB");
+
+const authRoutes = require("./routes/authRoutes.js");
+const orderRoutes = require("./routes/orderRoutes.js");
+const productRoutes = require("./routes/productRoutes.js");
+const categoryRoutes = require("./routes/categoryRoutes.js");
+
+
+const port = process.env.PORT || 3000;
+
+app.use(helmet());
+app.use(bodyParser.json());
+
+app.use(
+  cors({
+    origin: process.env.FRON_END_URI,
+    methods: ["GET", "POST"],
+  })
+);
+
+// Routs
+app.use("/auth", authRoutes);
+app.use("/orders" , orderRoutes)
+app.use("/products" , productRoutes)
+app.use("/category" , categoryRoutes)
+
+ 
+// Database Connection
+connectMongoDB();
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+ 
