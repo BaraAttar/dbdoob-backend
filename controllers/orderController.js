@@ -13,6 +13,7 @@ exports.getAllOrders = async (req, res) => {
     if (req.query.status) filters.status = req.query.status;
     if (req.query.customerId) filters.customer = req.query.customerId;
     if (req.query.bookingDate) filters.bookingDate = req.query.bookingDate;
+    if (req.query.productId) filters.product = req.query.productId;
 
     // (1) Fetch the rders with pagination and filters
     const allOrders = await Order.find(filters)
@@ -39,7 +40,7 @@ exports.getAllOrders = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    res.status(500).send({ message: "Error fetching orders", error });
+    res.status(500).send({ message: "Error fetching orders" });
   }
 };
 
@@ -75,7 +76,29 @@ exports.getMyOrders = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    res.status(500).send({ message: "Error fetching orders", error });
+    res.status(500).send({ message: "Error fetching orders" });
+  }
+};
+
+exports.getSingleOrder = async (req, res) => {
+  // http://localhost:3001/orders/:orderId , http://localhost:3001/orders/${orderId}
+  try {
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId)
+
+      .populate({
+        path: "customer",
+        select: "-password",
+      })
+      .populate("product");
+
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    res.status(200).send(order);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).send({ message: "Error fetching order" });
   }
 };
 
@@ -101,9 +124,10 @@ exports.createOrder = async (req, res) => {
     }
 
     // (4) Validate bookingDate format
-    if (!validateDate(bookingDate)) {
+    if (isNaN(Date.parse(bookingDate))) {
       return res.status(400).json({ message: "Invalid bookingDate format" });
     }
+    
     // (5) Create and save the order
     const customer = user._id;
     const order = new Order({
@@ -120,6 +144,34 @@ exports.createOrder = async (req, res) => {
     res.status(201).json(order);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: `Database error: ${error.message}` });
+    res.status(500).json({ message: `Database error` });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, newStatus } = req.body;
+    const allowedStatuses = ["pending", "rejected", "accepted"];
+
+    if (!orderId) return res.status(400).send("order id is requred");
+    if (!newStatus) return res.status(400).send(" fill status feald");
+    if (!allowedStatuses.includes(newStatus))
+      return res.status(400).send(`Invalid status use ${allowedStatuses} `);
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      {status : newStatus },
+      { new: true }
+    );
+
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    res.status(200).json({
+      message: `Order status updated to: ${newStatus}`,
+      order: order, 
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "server error" });
   }
 };
