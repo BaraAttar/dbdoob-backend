@@ -7,7 +7,6 @@
 ├── database
 │   └── connectMongoDB.js
 ├── models
-│   ├── Cart.js
 │   ├── Category.js
 │   ├── Order.js
 │   ├── Product.js

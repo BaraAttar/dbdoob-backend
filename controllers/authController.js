@@ -1,5 +1,4 @@
 const User = require("../models/User.js");
-const Cart = require("../models/Cart.js");
 const jwt = require("jsonwebtoken");
 
 exports.logIn = async (req, res) => {
@@ -56,9 +55,6 @@ exports.signUp = async (req, res) => {
     const user = new User({ name, email, password });
     const savedUser = await user.save();
 
-    const cart = new Cart({ userID: savedUser._id });
-    await cart.save();
-
     const token = jwt.sign(
       {
         id: user.id,
@@ -72,7 +68,7 @@ exports.signUp = async (req, res) => {
     delete userInfo.password;
 
     // res.status(201).json({ token , userInfo });
-    res.status(201).json({ user: userInfo, cart, token });
+    res.status(201).json({ user: userInfo, token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error during signup" });

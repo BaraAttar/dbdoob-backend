@@ -1,20 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
-const { createOrder, getAllOrders , getMyAllOrders } = require("../controllers/orderController");
+const { createOrder, getAllOrders , getMyOrders } = require("../controllers/orderController");
 const { authToken } = require("../Middleware/auth");
 const { adminPermissions } = require("../Middleware/adminPermissions");
 
-// api/order
-router.post("/", authToken, createOrder);
+// api/orders
 
+// admin
 router.get("/", adminPermissions, getAllOrders);
 
-router.get("/myorders", authToken, getMyAllOrders);
+// client
+router.post("/", authToken, createOrder);
+router.get("/my", authToken, getMyOrders);
 
-// router 
-//   .route("/:id")
-//   .get(authenticateUser, getSingleOrder)
-//   .patch(authenticateUser, updateOrder);
+
+// TODO 
+// getSingleOrder, updateOrder, updateOrderStatus
+
 
 module.exports = router;

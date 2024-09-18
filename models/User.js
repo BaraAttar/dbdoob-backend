@@ -37,12 +37,6 @@ const userSchema = new Schema({
       ref: "Order",
     },
   ],
-  cart: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Cart",
-    },
-  ],
   createdAt: {
     type: Date,
     default: Date.now,
