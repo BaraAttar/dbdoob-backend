@@ -8,6 +8,7 @@ const app = express();
 const connectMongoDB = require("./database/connectMongoDB");
 
 const authRoutes = require("./routes/authRoutes.js");
+const userRoutes = require("./routes/userRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const categoryRoutes = require("./routes/categoryRoutes.js");
@@ -27,6 +28,7 @@ app.use(
 
 // Routs
 app.use("/auth", authRoutes);
+app.use("/user" , userRoutes)
 app.use("/orders" , orderRoutes)
 app.use("/products" , productRoutes)
 app.use("/category" , categoryRoutes)
