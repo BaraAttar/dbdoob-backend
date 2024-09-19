@@ -3,9 +3,9 @@ const jwt = require("jsonwebtoken");
 
 exports.logIn = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { userName, email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ $or: [{ email }, { userName }] });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -20,19 +20,19 @@ exports.logIn = async (req, res) => {
 
     const token = jwt.sign(
       {
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
         id: user.id,
         name: user.name,
         email: user.email,
       },
-      process.env.SECRET_KEY
-    );
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
 
+    );
 
     const userInfo = { ...user._doc };
     delete userInfo.password;
 
-    res.status(200).json({ token , userInfo });
+    res.status(200).json({ token, userInfo });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error retrieving user" });
@@ -41,19 +41,40 @@ exports.logIn = async (req, res) => {
 
 exports.signUp = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, userName, phoneNumber, email, password } =
+      req.body;
 
-    // Check for existing user
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already used" });
+    if (
+      !firstName ||
+      !lastName ||
+      !userName ||
+      !phoneNumber ||
+      !email ||
+      !password
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Hash password
-    // const hashedPassword = await hashPassword(password);
+    // Check for existing user
+    const existingUser = await User.findOne({
+      $or: [{ email }, { userName }],
+    });
 
-    const user = new User({ name, email, password });
-    const savedUser = await user.save();
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "Email or Username already used" });
+    }
+
+    const user = new User({
+      firstName,
+      lastName,
+      userName,
+      phoneNumber,
+      email,
+      password,
+    });
+    await user.save();
 
     const token = jwt.sign(
       {
@@ -61,11 +82,11 @@ exports.signUp = async (req, res) => {
         name: user.name,
         email: user.email,
       },
-      process.env.SECRET_KEY
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" }
     );
 
-    const userInfo = { ...user._doc };
-    delete userInfo.password;
+    const { password: _, ...userInfo } = user._doc;
 
     // res.status(201).json({ token , userInfo });
     res.status(201).json({ user: userInfo, token });

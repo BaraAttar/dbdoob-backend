@@ -5,11 +5,29 @@ const emailRegex =
   /^((?:[A-Za-z0-9!#$%&'*+\-\/=?^_`{|}~]|(?<=^|\.)"|"(?=$|\.|@)|(?<=".*)[ .](?=.*")|(?<!\.)\.){1,64})(@)((?:[A-Za-z0-9.\-])*(?:[A-Za-z0-9])\.(?:[A-Za-z0-9]){2,})$/;
 
 const userSchema = new Schema({
-  name: {
+  firstName: {
     type: String,
     required: true,
     trim: true,
+    maxlength: 10,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 10,
+  },
+  userName: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
     maxlength: 20,
+  },
+  phoneNumber : {
+    type : Number,
+    required : true,
+    trim: true,
   },
   email: {
     type: String,

@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const mongoose = require("mongoose");
 
+// TODO search by name
+
 exports.getUsers = async (req, res) => {
   try {
     const { userId } = req.query;
