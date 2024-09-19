@@ -21,10 +21,14 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: process.env.FRON_END_URI || "*",
-    methods: ["GET", "POST"],
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"]
   })
 );
+
+app.get('/test', (req, res) => {
+  res.json({ message: "API is working!" });
+});
 
 // Routs
 app.use("/auth", authRoutes);
