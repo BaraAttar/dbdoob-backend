@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: process.env.FRON_END_URI,
+    origin: process.env.FRON_END_URI || "*",
     methods: ["GET", "POST"],
   })
 );
