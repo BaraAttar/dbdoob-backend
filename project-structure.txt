@@ -22,13 +22,3 @@
 
 tree -I 'node_modules' > project-structure.txt
 
-
-1 - samsung , Order :1
-2 - apple , Order :2
-3 - oppo , Order :3
-4 - relme , Order :4
-to 
-1 - oppo , Order :1
-2 - samsung , Order :2
-3 - apple , Order :3
-4 - relme , Order :4
