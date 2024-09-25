@@ -27,3 +27,23 @@ exports.getUsers = async (req, res) => {
     res.status(500).send("server error");
   }
 };
+
+exports.restoreUser = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user || !user.id) {
+      return res.status(400).json({ message: "Invalid request, user not provided" });
+    }
+
+    const restoredUser = await User.findById(user.id).select("-password")
+
+    if (!restoredUser) {
+      res.status(404).send("user not found")
+    }
+
+    return res.status(200).json(restoredUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("server error");
+  }
+};
