@@ -32,7 +32,7 @@ exports.logIn = async (req, res) => {
     const userInfo = { ...user._doc };
     delete userInfo.password;
 
-    res.status(200).json({ token, userInfo });
+    res.status(200).json({ token, user : userInfo });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error retrieving user" });
