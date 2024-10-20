@@ -63,7 +63,7 @@ exports.getProducts = async (req, res) => {
   try {
     const { category, name } = req.query;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     // Build query object based on the provided filters
