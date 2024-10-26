@@ -6,6 +6,11 @@ const categorySchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
+    maxlength: 15,
+  },
+  status:{
+    type : String,
+    maxlength: 10,
   },
   order: {
     type: Number,

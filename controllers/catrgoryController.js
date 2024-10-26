@@ -18,6 +18,7 @@ exports.addCategory = async (req, res) => {
     // (4) Create and save new category
     const newCategory = new Category({
       name: req.body.categoryName,
+      status: req.body.status,
       order: newOrder,
     });
     await newCategory.save();
