@@ -9,13 +9,19 @@ exports.addCategory = async (req, res) => {
         .send("Invalid category name: Please provide a string value.");
     }
 
-    // (2) Find the category with the highest order
+    // (2) Find if category name already exists
+    const existsCategory = await Category.find({ name: req.body.categoryName });
+    if (existsCategory) {
+      return res.status(409).send({ message: "Category already exists." });
+    }
+
+    // (3) Find the category with the highest order
     const highestOrderCategory = await Category.findOne().sort({ order: -1 });
 
-    // (3) Set the new category's order
+    // (4) Set the new category's order
     const newOrder = highestOrderCategory ? highestOrderCategory.order + 1 : 1;
 
-    // (4) Create and save new category
+    // (5) Create and save new category
     const newCategory = new Category({
       name: req.body.categoryName,
       status: req.body.status,
