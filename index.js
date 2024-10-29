@@ -13,7 +13,6 @@ const orderRoutes = require("./routes/orderRoutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const categoryRoutes = require("./routes/categoryRoutes.js");
 
-
 const port = process.env.PORT || 3000;
 
 app.use(helmet());
@@ -36,7 +35,6 @@ app.use("/user" , userRoutes)
 app.use("/orders" , orderRoutes)
 app.use("/products" , productRoutes)
 app.use("/category" , categoryRoutes)
-
  
 // Database Connection
 connectMongoDB();

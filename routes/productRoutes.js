@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../Middleware/uploadMiddleware")
 
 const {
   addProduct,
@@ -12,11 +13,11 @@ const { adminPermissions } = require("../Middleware/adminPermissions");
 // api/product
 
 // admin
-router.post("/", adminPermissions, addProduct);
+router.post("/", adminPermissions, upload.single("file"), addProduct);
 router.put("/", adminPermissions, updateProduct);
 router.delete("/", adminPermissions, deleteProduct);
 
 // client
 router.get("/", getProducts);
 
-module.exports = router; 
+module.exports = router;

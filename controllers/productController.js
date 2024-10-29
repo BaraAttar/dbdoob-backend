@@ -1,24 +1,51 @@
 const Category = require("../models/Category");
 const Product = require("../models/Product");
+const { uploadImage } = require("../services/cloudinary");
 
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, category, image } = req.body;
+    const { name, description, category, price, cost } = req.body;
 
-    // (1) get catedories list
+    // (0) Check for all required fields
+    if (!name || !description || !category || !price || !cost) {
+      return res.status(400).json({ message: "All fields are required: name, description, category, price, cost." });
+    }
+
+    // (1) Retrieve the list of categories
     const categories = await Category.find();
     const categoriesList = categories.map((cat) => cat.name);
 
-    // (2) creat product with existed catedory
+    // Default image URL
+    let imageUrl =
+      "https://res.cloudinary.com/dkvauszbh/image/upload/v1730245042/package_afdj6n.svg"; 
+
+    // (2) Upload image to Cloudinary if a file is provided in the request
+    if (req.file) {
+      const uploadResult = await uploadImage(req.file);
+      if (!uploadResult || !uploadResult.secure_url) {
+        return res.status(500).json({ message: "Failed to upload image" });
+      }
+      imageUrl = uploadResult.secure_url; // تحديث imageUrl إذا تمت عملية الرفع بنجاح
+    }
+
+    // (3) Create product if category exists
     if (categoriesList.includes(category)) {
-      const product = new Product({ name, description, category, image });
+      const product = new Product({
+        name,
+        description,
+        category,
+        price,
+        cost,
+        image: imageUrl,
+      });
+
       await product.save();
       res.status(201).json(product);
     } else {
-      res.send("category not found");
+      res.status(404).send("Category not found");
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error adding product:", error);
     res.status(500).json({ message: error.message });
   }
 };
