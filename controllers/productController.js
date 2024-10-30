@@ -8,7 +8,10 @@ exports.addProduct = async (req, res) => {
 
     // (0) Check for all required fields
     if (!name || !description || !category || !price || !cost) {
-      return res.status(400).json({ message: "All fields are required: name, description, category, price, cost." });
+      return res.status(400).json({
+        message:
+          "All fields are required: name, description, category, price, cost.",
+      });
     }
 
     // (1) Retrieve the list of categories
@@ -17,7 +20,7 @@ exports.addProduct = async (req, res) => {
 
     // Default image URL
     let imageUrl =
-      "https://res.cloudinary.com/dkvauszbh/image/upload/v1730245042/package_afdj6n.svg"; 
+      "https://res.cloudinary.com/dkvauszbh/image/upload/v1730245042/package_afdj6n.svg";
 
     // (2) Upload image to Cloudinary if a file is provided in the request
     if (req.file) {
@@ -40,7 +43,7 @@ exports.addProduct = async (req, res) => {
       });
 
       await product.save();
-      res.status(201).json(product);
+      res.status(201).json({ message: "New product added successfully" });
     } else {
       res.status(404).send("Category not found");
     }
@@ -77,7 +80,7 @@ exports.updateProduct = async (req, res) => {
     );
 
     return res.status(200).json({
-      message: "Procuct updated successfully",
+      message: "Product updated successfully",
       product: updateProduct,
     });
   } catch (error) {
