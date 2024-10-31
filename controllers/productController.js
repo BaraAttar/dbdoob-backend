@@ -24,11 +24,16 @@ exports.addProduct = async (req, res) => {
 
     // (2) Upload image to Cloudinary if a file is provided in the request
     if (req.file) {
-      const uploadResult = await uploadImage(req.file);
-      if (!uploadResult || !uploadResult.secure_url) {
-        return res.status(500).json({ message: "Failed to upload image" });
+      try {
+        const uploadResult = await uploadImage(req.file);
+        if (!uploadResult || !uploadResult.secure_url) {
+          return res.status(500).json({ message: "Failed to upload image" });
+        }
+        imageUrl = uploadResult.secure_url; 
+      } catch (uploadError) {
+        console.error("Error uploading image:", uploadError);
+        return res.status(500).json({ message: "Image upload failed" });
       }
-      imageUrl = uploadResult.secure_url; // تحديث imageUrl إذا تمت عملية الرفع بنجاح
     }
 
     // (3) Create product if category exists
