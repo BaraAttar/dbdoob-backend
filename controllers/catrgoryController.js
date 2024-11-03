@@ -2,16 +2,25 @@ const Category = require("../models/Category");
 
 exports.addCategory = async (req, res) => {
   try {
-    //(1) Validate category name
-    if (!req.body.categoryName || typeof req.body.categoryName !== "string") {
+
+    // (1) Validate category name and status
+    const categoryName = req.body.categoryName?.trim();
+    const status = req.body.status;
+
+    if (!categoryName || typeof categoryName !== "string") {
       return res
         .status(400)
         .send("Invalid category name: Please provide a string value.");
     }
 
+    if (status !== undefined && typeof status !== "string") {
+      return res.status(400).json({ message: "Invalid status: Please provide a valid string value." });
+    }
+
     // (2) Find if category name already exists
-    const existsCategory = await Category.find({ name: req.body.categoryName });
+    const existsCategory = await Category.findOne({ name: categoryName });
     if (existsCategory) {
+      console.log(existsCategory)
       return res.status(409).send({ message: "Category already exists." });
     }
 
@@ -23,8 +32,8 @@ exports.addCategory = async (req, res) => {
 
     // (5) Create and save new category
     const newCategory = new Category({
-      name: req.body.categoryName,
-      status: req.body.status,
+      name: categoryName,
+      status: status,
       order: newOrder,
     });
     await newCategory.save();
