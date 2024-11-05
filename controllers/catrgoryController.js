@@ -48,7 +48,25 @@ exports.addCategory = async (req, res) => {
 
 exports.showCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    // const categories = await Category.find();
+
+    const categories = await Category.aggregate([
+      {
+        $lookup: {
+          from: 'products', 
+          localField: 'name',
+          foreignField: 'category',
+          as: 'products'
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          status:1,
+          numberOfProducts: { $size: '$products' } 
+        }
+      }
+    ]);
 
     if (categories.length === 0) {
       res.status(404).send("No categories found.");
