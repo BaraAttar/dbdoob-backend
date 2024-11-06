@@ -12,10 +12,6 @@ const categorySchema = new mongoose.Schema({
     type : String,
     maxlength: 10,
   },
-  order: {
-    type: Number,
-    default : 1
-  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -29,7 +29,7 @@ exports.addProduct = async (req, res) => {
         if (!uploadResult || !uploadResult.secure_url) {
           return res.status(500).json({ message: "Failed to upload image" });
         }
-        imageUrl = uploadResult.secure_url; 
+        imageUrl = uploadResult.secure_url;
       } catch (uploadError) {
         console.error("Error uploading image:", uploadError);
         return res.status(500).json({ message: "Image upload failed" });
@@ -96,10 +96,24 @@ exports.updateProduct = async (req, res) => {
 
 exports.getProducts = async (req, res) => {
   try {
-    const { category, name } = req.query;
+    const { category, name, sort } = req.query;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+
+    // Build sort object based on the provided filters
+    let sortBy = {};
+    if (sort) {
+      if (sort === "A-Z") {
+        sortBy.name = 1; 
+      } else if (sort === "Z-A") {
+        sortBy.name = -1; 
+      } else if (sort === "price-asc") {
+        sortBy.price = 1; 
+      } else if (sort === "price-desc") {
+        sortBy.price = -1; 
+      }
+    }
 
     // Build query object based on the provided filters
     let query = {};
@@ -111,7 +125,11 @@ exports.getProducts = async (req, res) => {
     }
 
     // Fetch the products with pagination and filters
-    const allProducts = await Product.find(query).skip(skip).limit(limit);
+    const allProducts = await Product.find(query)
+      .sort(sortBy)
+      .collation({ locale: 'en', strength: 2 })
+      .skip(skip)
+      .limit(limit);
 
     // Get the total count of products for pagination metadata
     const totalProducts = await Product.countDocuments(query);

@@ -2,7 +2,6 @@ const Category = require("../models/Category");
 
 exports.addCategory = async (req, res) => {
   try {
-
     // (1) Validate category name and status
     const categoryName = req.body.categoryName?.trim();
     const status = req.body.status;
@@ -14,27 +13,24 @@ exports.addCategory = async (req, res) => {
     }
 
     if (status !== undefined && typeof status !== "string") {
-      return res.status(400).json({ message: "Invalid status: Please provide a valid string value." });
+      return res
+        .status(400)
+        .json({
+          message: "Invalid status: Please provide a valid string value.",
+        });
     }
 
     // (2) Find if category name already exists
     const existsCategory = await Category.findOne({ name: categoryName });
     if (existsCategory) {
-      console.log(existsCategory)
+      console.log(existsCategory);
       return res.status(409).send({ message: "Category already exists." });
     }
 
-    // (3) Find the category with the highest order
-    const highestOrderCategory = await Category.findOne().sort({ order: -1 });
-
-    // (4) Set the new category's order
-    const newOrder = highestOrderCategory ? highestOrderCategory.order + 1 : 1;
-
-    // (5) Create and save new category
+    // (3) Create and save new category
     const newCategory = new Category({
       name: categoryName,
       status: status,
-      order: newOrder,
     });
     await newCategory.save();
 
@@ -48,24 +44,28 @@ exports.addCategory = async (req, res) => {
 
 exports.showCategories = async (req, res) => {
   try {
-    // const categories = await Category.find();
 
     const categories = await Category.aggregate([
       {
         $lookup: {
-          from: 'products', 
-          localField: 'name',
-          foreignField: 'category',
-          as: 'products'
-        }
+          from: "products",
+          localField: "name",
+          foreignField: "category",
+          as: "products",
+        },
       },
       {
         $project: {
           name: 1,
-          status:1,
-          numberOfProducts: { $size: '$products' } 
-        }
-      }
+          status: 1,
+          products: { $size: "$products" },
+        },
+      },
+      {
+        $sort: {
+          name: 1,
+        },
+      },
     ]);
 
     if (categories.length === 0) {
@@ -117,7 +117,7 @@ exports.updateCategory = async (req, res) => {
 
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,
-      {name},
+      { name },
       { new: true, runValidators: true }
     );
 
